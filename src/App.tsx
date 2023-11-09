@@ -9,25 +9,25 @@ import logo from './assets/logo.png';
 function App() {
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
-
   useEffect(() => {
-    const checkEndpoint = () => {
-      axios.head('https://google.com', {
-        headers: {
-          'Access-Control-Allow-Origin': 'https://google.com', // Define o domínio permitido
-          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS' // Define os métodos permitidos
-          // Outros cabeçalhos podem ser adicionados aqui, se necessário
+    const checkEndpoints = async () => {
+      try {
+        const response = await axios.head('http://localhost:4000/teste-wms');
+        if (response.status === 200) {
+          console.log('Retorna 200');
+        } else {
+          const secondResponse = await axios.head('http://localhost:4000/teste-wms-ip');
+          if (secondResponse.status === 200) {
+            console.log('Retorna 200');
+          } else {
+            console.log('Ambos os endpoints não retornaram 200');
+          }
         }
-      })
-        .then(response => {
-          setResponseStatus(response.status);
-        })
-        .catch(error => {
-          setResponseStatus(null); // Lida com o erro conforme necessário
-        });
+      } catch (error) {
+        console.error('Erro:', error);
+      }
     };
-
-    checkEndpoint();
+    checkEndpoints();
   }, []);
 
   return (
@@ -38,11 +38,6 @@ function App() {
           <C.Typography variant="h3">Ambiente</C.Typography>
           <C.StyledBtn className='m-2'>HOMOLOGAÇÃO</C.StyledBtn>
           <C.StyledBtn className='m-2'>PRODUÇÃO</C.StyledBtn>
-          {responseStatus !== null ? (
-            <p>Resposta do endpoint: {responseStatus === 200 ? 'OK' : 'Não OK'}</p>
-          ) : (
-            <p>Verificando...</p>
-          )}
         </C.StyledCard>
       </div>
     </>
